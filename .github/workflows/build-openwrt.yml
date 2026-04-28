@@ -111,25 +111,8 @@ jobs:
     - name: Upgrade some network software version
       run: |
         cd openwrt
-
-        rm -rf feeds/packages/net/natmap
-        wget -r --no-parent https://cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/natmap/
-        cp -rf cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/natmap feeds/packages/net/natmap/
-        rm -rf cdn.jsdelivr.net
-        find feeds/packages/net/natmap -name index.html -exec rm {} \;
-
-        rm -rf feeds/packages/net/ddns-go
-        wget -r --no-parent https://cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/ddns-go/
-        cp -rf cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/ddns-go feeds/packages/net/ddns-go/
-        rm -rf cdn.jsdelivr.net
-        find feeds/packages/net/ddns-go -name index.html -exec rm {} \;    
-
-        rm -rf feeds/packages/net/frp
-        wget -r --no-parent https://cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/frp/
-        cp -rf cdn.jsdelivr.net/gh/immortalwrt/packages@master/net/frp feeds/packages/net/frp/
-        rm -rf cdn.jsdelivr.net
-        find feeds/packages/net/frp -name index.html -exec rm {} \; 
-
+        
+        # Chỉ giữ lại phần tải TurboACC, xóa bỏ các phần wget FRP, DDNS-GO...
         wget "https://www.dropbox.com/scl/fi/uccikbibj772c4sekzbk7/luci-app-turboacc.zip?rlkey=yzhkk0lfzhrthn8hbl1qt8k5j&st=31820445&dl=1" -O luci-app-turboacc.zip
         rm -rf feeds/luci/applications/luci-app-turboacc
         unzip luci-app-turboacc.zip -d feeds/luci/applications/
@@ -143,11 +126,18 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
         
-        # Bỏ qua lỗi đệ quy của SQM (nếu có)
+        # --- FIX CÁC LỖI HIỆN TẠI ---
+        # Bỏ qua lỗi đệ quy
         sed -i '/sqm-scripts/d' .config
+        sed -i '/dnsmasq_full_conntrack/d' .config
         
-        # --- THÊM PHẦN NÀY ĐỂ ÉP CÀI ĐẶT OPENCLASH VÀ WIREGUARD ---
+        # Ép tắt các phần mềm VPN/Proxy thừa thãi gây lỗi build
+        echo "# CONFIG_PACKAGE_frpc is not set" >> .config
+        echo "# CONFIG_PACKAGE_frps is not set" >> .config
+        echo "# CONFIG_PACKAGE_luci-app-frpc is not set" >> .config
+        echo "# CONFIG_PACKAGE_luci-app-ddns-go is not set" >> .config
         
+        # --- KÍCH HOẠT WIREGUARD & OPENCLASH ---
         # 1. Kích hoạt WireGuard
         echo "CONFIG_PACKAGE_kmod-wireguard=y" >> .config
         echo "CONFIG_PACKAGE_wireguard-tools=y" >> .config
@@ -159,8 +149,6 @@ jobs:
         echo "CONFIG_PACKAGE_curl=y" >> .config
         echo "CONFIG_PACKAGE_iptables-mod-tproxy=y" >> .config
         echo "CONFIG_PACKAGE_kmod-ipt-tproxy=y" >> .config
-        
-        # Ép bật các gói bị ẩn (hệ thống sẽ tự động bật coreutils và ruby)
         echo "CONFIG_PACKAGE_coreutils-nohup=y" >> .config
         echo "CONFIG_PACKAGE_ruby=y" >> .config
         echo "CONFIG_PACKAGE_ruby-yaml=y" >> .config
