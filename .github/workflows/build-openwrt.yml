@@ -142,6 +142,28 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+        
+        # Bỏ qua lỗi đệ quy của SQM (nếu có)
+        sed -i '/sqm-scripts/d' .config
+        
+        # --- THÊM PHẦN NÀY ĐỂ ÉP CÀI ĐẶT OPENCLASH VÀ WIREGUARD ---
+        
+        # 1. Kích hoạt WireGuard
+        echo "CONFIG_PACKAGE_kmod-wireguard=y" >> .config
+        echo "CONFIG_PACKAGE_wireguard-tools=y" >> .config
+        echo "CONFIG_PACKAGE_luci-app-wireguard=y" >> .config
+        echo "CONFIG_PACKAGE_luci-proto-wireguard=y" >> .config
+        
+        # 2. Kích hoạt OpenClash và các dependencies bắt buộc
+        echo "CONFIG_PACKAGE_luci-app-openclash=y" >> .config
+        echo "CONFIG_PACKAGE_curl=y" >> .config
+        echo "CONFIG_PACKAGE_iptables-mod-tproxy=y" >> .config
+        echo "CONFIG_PACKAGE_kmod-ipt-tproxy=y" >> .config
+        
+        # Ép bật các gói bị ẩn (hệ thống sẽ tự động bật coreutils và ruby)
+        echo "CONFIG_PACKAGE_coreutils-nohup=y" >> .config
+        echo "CONFIG_PACKAGE_ruby=y" >> .config
+        echo "CONFIG_PACKAGE_ruby-yaml=y" >> .config
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
