@@ -3,6 +3,7 @@ Build Immortalwrt for CMCC RAX3000Q/QY using GitHub Actions
 
 Kernel Version : 5.4-QSDK
 
+- Support WG + Openclash
 - Support IPV6
 - Support Wi-Fi NSS
 - Support NAT NSS
