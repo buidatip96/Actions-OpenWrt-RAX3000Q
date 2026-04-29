@@ -128,6 +128,11 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
         
+        # --- KHAI BÁO PHẦN CỨNG (BẮT BUỘC ĐỂ NHẬN DIỆN RAX3000Q/QY) ---
+        echo "CONFIG_TARGET_ipq50xx=y" >> .config
+        echo "CONFIG_TARGET_ipq50xx_arm=y" >> .config
+        echo "CONFIG_TARGET_ipq50xx_arm_DEVICE_cmcc_rax3000q=y" >> .config
+        
         # --- FIX CÁC LỖI HIỆN TẠI ---
         # Bỏ qua lỗi đệ quy
         sed -i '/sqm-scripts/d' .config
