@@ -23,8 +23,10 @@ on:
     - cron: 0 8 * * 2
 
 env:
-  REPO_URL: https://github.com/kkstone/immortalwrt-ipq50xx
-  REPO_BRANCH: openwrt-21.02
+  # Chuyển sang repo ImmortalWrt chính thức hoặc repo hỗ trợ Kernel mới cho IPQ50xx
+  REPO_URL: https://github.com/immortalwrt/immortalwrt
+  # Sử dụng nhánh 23.05 để có Kernel 5.15 ổn định nhất cho WireGuard
+  REPO_BRANCH: openwrt-23.05
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
@@ -32,7 +34,7 @@ env:
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
-  TZ: Asia/Shanghai
+  TZ: Asia/Ho_Chi_Minh
 
 jobs:
   build:
