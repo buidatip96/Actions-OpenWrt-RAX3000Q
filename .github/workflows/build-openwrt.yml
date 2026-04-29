@@ -24,9 +24,8 @@ on:
 
 env:
   # Chuyển sang repo ImmortalWrt chính thức hoặc repo hỗ trợ Kernel mới cho IPQ50xx
-  REPO_URL: https://github.com/immortalwrt/immortalwrt
-  # Sử dụng nhánh 23.05 để có Kernel 5.15 ổn định nhất cho WireGuard
-  REPO_BRANCH: openwrt-23.05
+  REPO_URL: https://github.com/kkstone/immortalwrt-ipq50xx
+  REPO_BRANCH: openwrt-21.02
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
@@ -88,7 +87,7 @@ jobs:
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true'
-        mixkey: 'immortalwrt23-cortexa7-vfpv4'
+        mixkey: 'immortalwrt21-cortexa7-vfpv4'
         prefix: ${{ github.workspace }}/openwrt
 
     - name: Load custom feeds
@@ -177,7 +176,21 @@ jobs:
         echo "# CONFIG_PACKAGE_luci-app-bird1-ipv4 is not set" >> .config
         echo "# CONFIG_PACKAGE_luci-app-bird1-ipv6 is not set" >> .config
         echo "# CONFIG_PACKAGE_luci-app-bcp38 is not set" >> .config
+        
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
+    - name: Fix some download failed first
+      run: |
+        cd openwrt
+        mkdir dl
+        wget "https://www.dropbox.com/scl/fi/9ts30p2csnlb9imaf8k68/backports-20210222-5.4-qsdk-11.5.0.5.tar.xz?rlkey=sntbyfjgg86gu2uoocgb9ggp1&st=7w81hl56&dl=1" -O dl/backports-20210222-5.4-qsdk-11.5.0.5.tar.xz
+        wget "https://www.dropbox.com/scl/fi/gu7ge6jmefn72ttuop1zs/linux-5.4-qsdk-11.5.0.5.tar.xz?rlkey=tdpq0ye35x290frbh7i8uqrm8&st=jjvegqrr&dl=1" -O dl/linux-5.4-qsdk-11.5.0.5.tar.xz
+        
     - name: Download package
       id: package
       run: |
