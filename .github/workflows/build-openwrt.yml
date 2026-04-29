@@ -88,7 +88,7 @@ jobs:
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true'
-        mixkey: 'immortalwrt21-cortexa7-vfpv4'
+        mixkey: 'immortalwrt23-cortexa7-vfpv4'
         prefix: ${{ github.workspace }}/openwrt
 
     - name: Load custom feeds
@@ -156,6 +156,10 @@ jobs:
         echo "CONFIG_PACKAGE_ruby-yaml=y" >> .config
         
         # --- LOẠI BỎ CÁC GÓI RÁC / TỐN RAM ---
+        
+        # Nhóm chặn quảng cáo (Đã có OpenClash lo)
+        echo "# CONFIG_PACKAGE_luci-app-adblock is not set" >> .config
+        echo "# CONFIG_PACKAGE_luci-app-adbyby-plus is not set" >> .config
         
         # Nhóm Download / NAS / Lưu trữ
         echo "# CONFIG_PACKAGE_luci-app-alist is not set" >> .config
